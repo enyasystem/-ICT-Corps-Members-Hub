@@ -8,7 +8,7 @@ $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $sql = "SELECT u.id, u.name, u.profile_picture, u.occupation, u.state_code, u.phone, u.email, u.business_id, u.contact_private, r.display_name as role_name, r.badge_color 
         FROM users u 
         LEFT JOIN roles r ON u.role_id = r.id 
-        WHERE u.name LIKE ? OR u.occupation LIKE ? 
+        WHERE u.role_id IS NULL AND (u.name LIKE ? OR u.occupation LIKE ?) 
         ORDER BY u.id DESC LIMIT 12";
 $stmt = $conn->prepare($sql);
 $like = "%$search%";
