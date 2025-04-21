@@ -1,0 +1,3 @@
+The vendor directory is typically managed by Composer and does not require any specific contents to be manually created. It is intentionally left blank as it will be populated with third-party libraries and dependencies when Composer is run.
+
+This file is intentionally left blank.
