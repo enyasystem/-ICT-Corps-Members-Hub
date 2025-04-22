@@ -7,7 +7,7 @@ $excos_result = $conn->query($excos_sql);
 $excos = $excos_result ? $excos_result->fetch_all(MYSQLI_ASSOC) : [];
 
 // Define the order for key roles
-$priority_roles = ['supervisor', 'president', 'vice-president', 'pro', 'treasurer'];
+$priority_roles = ['supervisor', 'president', 'vice-president', 'pro', 'treasurer', 'exco'];
 $priority_members = [];
 $other_members = [];
 foreach ($priority_roles as $role) {
@@ -40,7 +40,8 @@ function getBusiness($conn, $business_id) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Corper Connect</title>
   <!-- Tailwind CSS CDN for utility classes -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+  <!-- Bootstrap CSS loaded AFTER Tailwind to ensure Bootstrap's .collapse and other classes take precedence -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://hammerjs.github.io/dist/hammer.min.js"></script>
   <style>
@@ -48,7 +49,6 @@ function getBusiness($conn, $business_id) {
       height: 100%;
       margin: 0;
     }
-
     .hero-section {
       min-height: 100vh;
       display: flex;
@@ -59,16 +59,6 @@ function getBusiness($conn, $business_id) {
       transition: background 0.7s ease-in-out;
       overflow: hidden;
     }
-
-    .navbar-custom {
-      transition: all 0.3s ease;
-    }
-
-    .navbar-scrolled {
-      background-color: #166534 !important;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    }
-
     .particle {
       width: 8px;
       height: 8px;
@@ -78,12 +68,10 @@ function getBusiness($conn, $business_id) {
       position: absolute;
       animation: float 6s ease-in-out infinite alternate;
     }
-
     @keyframes float {
       0% { transform: translateY(0) scale(1); }
       100% { transform: translateY(-30px) scale(1.2); }
     }
-
     .indicator {
       width: 8px;
       height: 8px;
@@ -91,64 +79,200 @@ function getBusiness($conn, $business_id) {
       background-color: rgba(255, 255, 255, 0.5);
       transition: all 0.3s ease;
     }
-
     .indicator.active {
       background-color: white;
       width: 32px;
     }
-
     .hero-overlay {
       position: absolute;
       inset: 0;
       background-color: rgba(0, 0, 0, 0.5);
     }
-
     .hero-buttons .btn {
       min-width: 180px;
     }
-
     .fade-slide-in {
       opacity: 0;
       transform: translateY(20px);
       animation: fadeSlideIn 0.6s ease forwards;
     }
-
     @keyframes fadeSlideIn {
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
-
+    .collapse:not(.show) {
+      display: none !important;
+    }
+    .collapse.show {
+      display: block !important;
+    }
     @media (min-width: 768px) {
-      .navbar-collapse {
+      .navbar-expand-md .navbar-collapse {
         display: flex !important;
-        opacity: 1 !important;
-        visibility: visible !important;
+      }
+    }
+    .bs-navbar-collapse:not(.show) {
+      display: none !important;
+    }
+    .bs-navbar-collapse.show {
+      display: block !important;
+    }
+    @media (min-width: 768px) {
+      .navbar-expand-md .bs-navbar-collapse {
+        display: flex !important;
+      }
+    }
+    .member-card {
+      background: #fff;
+      border-radius: 1.2rem;
+      box-shadow: 0 4px 16px 0 rgba(22,101,52,0.10);
+      border: 1px solid #e0e0e0;
+      padding: 1.2rem 1rem 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      min-width: 0;
+      transition: box-shadow 0.3s, transform 0.3s;
+      position: relative;
+    }
+    .member-card:hover {
+      box-shadow: 0 8px 32px 0 rgba(22,101,52,0.18);
+      transform: translateY(-4px) scale(1.03);
+    }
+    .member-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 2px solid #16a34a;
+      object-fit: cover;
+      background: #f0fdf4;
+      margin-bottom: 0.5rem;
+    }
+    .member-name {
+      font-weight: bold;
+      color: #14532d;
+      font-size: 1rem;
+      margin-bottom: 0.2rem;
+      width: 100%;
+      letter-spacing: -0.5px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .member-occupation {
+      color: #198754;
+      font-size: 0.92rem;
+      margin-bottom: 0.5rem;
+      width: 100%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .member-skills {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .member-skill-badge {
+      background: #e6f4ea;
+      color: #198754;
+      border-radius: 999px;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      box-shadow: 0 1px 2px #e0e0e0;
+    }
+    .member-business {
+      color: #555;
+      font-size: 0.82rem;
+      margin-bottom: 0.3rem;
+      width: 100%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    /* Role badge colors */
+    .badge-supervisor { background: #1e293b; color: #fff; }
+    .badge-president { background: #14532d; color: #fff; }
+    .badge-vice-president { background: #15803d; color: #fff; }
+    .badge-pro { background: #0d9488; color: #fff; }
+    .badge-treasurer { background: #f59e42; color: #fff; }
+    .badge-exco { background: #6366f1; color: #fff; }
+    .badge-member { background: #e2e8f0; color: #222; }
+    .member-badge {
+      position: absolute;
+      top: 0.7rem;
+      left: 0.7rem;
+      z-index: 2;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+      margin-bottom: 0;
+      display: inline-block;
+      padding: 0.3rem 1rem;
+      border-radius: 999px;
+      box-shadow: 0 1px 4px #e0e0e0;
+    }
+    /* Details button */
+    .member-details-btn {
+      background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 0.4rem 1.2rem;
+      font-weight: 600;
+      font-size: 0.98rem;
+      margin-top: 0.5rem;
+      box-shadow: 0 2px 8px 0 rgba(22,101,52,0.10);
+      transition: background 0.2s, transform 0.2s;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .member-details-btn:hover {
+      background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+      color: #fff;
+      transform: scale(1.04);
+    }
+    @media (max-width: 575.98px) {
+      .member-card {
+        padding: 0.8rem 0.5rem 1rem 0.5rem;
+        border-radius: 0.8rem;
+      }
+      .member-avatar {
+        width: 44px;
+        height: 44px;
       }
     }
   </style>
 </head>
 <body>
 
+
+
 <!-- Navbar -->
-<nav class="navbar navbar-expand-md fixed-top navbar-dark navbar-custom">
+<nav class="navbar navbar-expand-md navbar-dark fixed-top">
   <div class="container">
     <a class="navbar-brand fw-bold text-white" href="#">CorperConnect</a>
-    <button class="navbar-toggler d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="d-md-flex w-100 justify-content-between align-items-center collapse navbar-collapse" id="navbarMenu">
-      <div class="d-flex flex-row mb-2 mb-lg-0 gap-3">
-        <a class="nav-link fw-bold text-white" href="#">Home</a>
-        <a class="nav-link fw-bold text-white" href="#">Members</a>
-        <a class="nav-link fw-bold text-white" href="#">Events</a>
-        <a class="nav-link fw-bold text-white" href="#">Resources</a>
-      </div>
-      <div class="d-flex gap-2">
-        <a class="btn btn-link text-white fw-bold" href="#">Login</a>
-        <a class="btn btn-light text-success fw-bold" href="#">Join Community</a>
-      </div>
+    <div class="collapse bs-navbar-collapse navbar-collapse" id="navbarMenu">
+      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+        <li class="nav-item"><a class="nav-link text-white" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="#">Members</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="#">Events</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="#">Resources</a></li>
+      </ul>
+      <ul class="navbar-nav mb-2 mb-md-0">
+        <li class="nav-item"><a class="nav-link text-white" href="#">Login</a></li>
+        <li class="nav-item"><a class="btn btn-light text-success ms-2" href="#">Join Community</a></li>
+      </ul>
     </div>
   </div>
 </nav>
@@ -194,29 +318,28 @@ function getBusiness($conn, $business_id) {
             $skills[] = $row['name'];
         }
         $business = getBusiness($conn, $member['business_id']);
-        $badgeClass = !empty($member['badge_color']) ? $member['badge_color'] : 'bg-green-200 text-green-900';
+        $role_key = strtolower($member['role_key'] ?? 'member');
+        $badgeClass = 'badge-' . str_replace('_', '-', $role_key);
       ?>
-      <div class="col-12 col-md-6 col-lg-4">
-        <div class="bg-white rounded-4 shadow-lg p-4 d-flex flex-column align-items-center position-relative member-card text-center w-100 max-w-xs min-w-[240px] border border-success-subtle transition-transform" style="transition: box-shadow 0.3s, transform 0.3s; box-shadow: 0 6px 32px 0 rgba(22,101,52,0.10); cursor:pointer;">
-          <?php if (!empty($member['role_name']) && strtolower($member['role_name']) !== 'member'): ?>
-            <span class="position-absolute top-0 start-0 translate-middle-y px-3 py-1 fw-semibold text-xs rounded-pill shadow-sm <?= htmlspecialchars($badgeClass) ?>" style="font-size:0.85rem;left:1rem;top:1rem;letter-spacing:0.5px;">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <div class="member-card">
+          <?php if (!empty($member['role_name']) && $role_key !== 'member'): ?>
+            <span class="member-badge <?= htmlspecialchars($badgeClass) ?> fw-semibold text-xs shadow-sm">
               <?= htmlspecialchars($member['role_name']) ?>
             </span>
           <?php endif; ?>
-          <div class="mb-2 position-relative" style="width: 72px; height: 72px;">
-            <img src="<?= $is_valid_picture ? htmlspecialchars($profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode($member['name']) . '&background=008751&color=fff' ?>" class="rounded-circle border border-3 border-success shadow" style="width: 72px; height: 72px; object-fit: cover; background: #f0fdf4;" alt="<?= htmlspecialchars($member['name']) ?>">
-          </div>
-          <div class="fw-bold text-success-emphasis mb-1 w-100 text-truncate" style="font-size: 1.15rem; letter-spacing: -0.5px;"> <?= htmlspecialchars($member['name']) ?> </div>
-          <div class="text-success mb-2 w-100 text-xs text-truncate" style="font-size: 0.98rem;"> <?= htmlspecialchars($member['occupation']) ?> </div>
-          <div class="d-flex flex-wrap justify-content-center gap-1 mb-2">
+          <img src="<?= $is_valid_picture ? htmlspecialchars($profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode($member['name']) . '&background=008751&color=fff' ?>" class="member-avatar" alt="<?= htmlspecialchars($member['name']) ?>">
+          <div class="member-name"> <?= htmlspecialchars($member['name']) ?> </div>
+          <div class="member-occupation"> <?= htmlspecialchars($member['occupation']) ?> </div>
+          <div class="member-skills">
             <?php foreach ($skills as $skill): ?>
-              <span class="badge rounded-pill bg-success-subtle text-success-emphasis px-2 py-1 shadow-sm" style="font-size: 0.75rem; font-weight: 500;"> <?= htmlspecialchars($skill) ?> </span>
+              <span class="member-skill-badge"> <?= htmlspecialchars($skill) ?> </span>
             <?php endforeach; ?>
           </div>
           <?php if ($business): ?>
-            <div class="text-secondary-emphasis w-100 mb-1 text-truncate" style="font-size: 0.85rem;">Business: <span class="fw-semibold"><?= htmlspecialchars($business) ?></span></div>
+            <div class="member-business">Business: <span class="fw-semibold"><?= htmlspecialchars($business) ?></span></div>
           <?php endif; ?>
-          <button type="button" class="mt-2 px-3 py-1.5 rounded-pill bg-gradient-to-r from-green-500 to-green-700 text-white fw-semibold shadow-sm border-0 hover:scale-105 hover:shadow-lg transition-all d-inline-flex align-items-center gap-1 text-sm" data-bs-toggle="modal" data-bs-target="#memberModal<?= $member['id'] ?>">
+          <button type="button" class="member-details-btn" data-bs-toggle="modal" data-bs-target="#memberModal<?= $member['id'] ?>">
             <i class="fa fa-info-circle"></i> Details
           </button>
         </div>
