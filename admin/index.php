@@ -76,16 +76,29 @@ $tab = $_GET['tab'] ?? 'users';
     <title>Admin Dashboard - ICT Corps Members Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
       .glass { background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); border-radius: 1.5rem; box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10); border: 1px solid rgba(0,135,81,0.08); }
       .sidebar-link.active { background: linear-gradient(90deg,#008751 0%,#00b16a 100%); color: #fff !important; }
       .sidebar-link { transition: background 0.2s, color 0.2s; }
       .sidebar-link:hover { background: #e6f9f0; color: #008751 !important; }
+      .sidebar-mobile { transition: left 0.3s cubic-bezier(.4,0,.2,1); }
+      @media (max-width: 1024px) {
+        .sidebar-desktop { display: none !important; }
+        .sidebar-mobile { display: flex !important; }
+      }
+      @media (min-width: 1025px) {
+        .sidebar-mobile { display: none !important; }
+      }
     </style>
 </head>
-<body class="bg-gradient-to-br from-green-50 to-green-200 min-h-screen flex">
-    <!-- Sidebar -->
-    <aside class="w-64 min-h-screen bg-white/80 border-r border-green-100 flex flex-col py-8 px-4 glass">
+<body class="bg-gradient-to-br from-green-50 to-green-200 min-h-screen flex flex-col lg:flex-row">
+    <!-- Mobile Sidebar Toggle -->
+    <button id="sidebarToggle" class="fixed top-4 left-4 z-50 bg-green-700 text-white p-3 rounded-full shadow-lg lg:hidden focus:outline-none">
+        <i class="fa fa-bars text-xl"></i>
+    </button>
+    <!-- Sidebar Desktop -->
+    <aside class="sidebar-desktop w-64 min-h-screen bg-white/80 border-r border-green-100 flex flex-col py-8 px-4 glass fixed lg:static left-0 top-0 z-40 h-full">
         <div class="flex items-center gap-3 mb-10">
             <span class="bg-green-700 rounded-full w-10 h-10 flex items-center justify-center"><i class="fa fa-user-shield text-white text-xl"></i></span>
             <span class="font-extrabold text-green-900 text-lg tracking-tight">Admin Panel</span>
@@ -100,15 +113,32 @@ $tab = $_GET['tab'] ?? 'users';
             <button class="w-full bg-red-600 px-4 py-2 rounded-lg text-white font-bold hover:bg-red-700 flex items-center gap-2 justify-center"><i class="fa fa-sign-out-alt"></i> Logout</button>
         </form>
     </aside>
+    <!-- Sidebar Mobile (Drawer) -->
+    <aside id="sidebarMobile" class="sidebar-mobile fixed left-[-100%] top-0 z-50 h-full w-64 bg-white/90 border-r border-green-100 flex flex-col py-8 px-4 glass shadow-xl">
+        <div class="flex items-center gap-3 mb-10">
+            <span class="bg-green-700 rounded-full w-10 h-10 flex items-center justify-center"><i class="fa fa-user-shield text-white text-xl"></i></span>
+            <span class="font-extrabold text-green-900 text-lg tracking-tight">Admin Panel</span>
+            <button id="sidebarClose" class="ml-auto text-green-700 text-2xl"><i class="fa fa-times"></i></button>
+        </div>
+        <nav class="flex flex-col gap-2">
+            <a href="?tab=users" class="sidebar-link px-4 py-3 rounded-lg font-semibold flex items-center gap-2 <?= $tab==='users' ? 'active' : 'text-green-900' ?>"><i class="fa fa-users"></i> Users</a>
+            <a href="?tab=events" class="sidebar-link px-4 py-3 rounded-lg font-semibold flex items-center gap-2 <?= $tab==='events' ? 'active' : 'text-green-900' ?>"><i class="fa fa-calendar"></i> Events</a>
+            <a href="?tab=resources" class="sidebar-link px-4 py-3 rounded-lg font-semibold flex items-center gap-2 <?= $tab==='resources' ? 'active' : 'text-green-900' ?>"><i class="fa fa-book"></i> Resources</a>
+            <a href="?tab=settings" class="sidebar-link px-4 py-3 rounded-lg font-semibold flex items-center gap-2 <?= $tab==='settings' ? 'active' : 'text-green-900' ?>"><i class="fa fa-cog"></i> Site Settings</a>
+        </nav>
+        <form method="post" action="?logout=1" class="mt-auto pt-10">
+            <button class="w-full bg-red-600 px-4 py-2 rounded-lg text-white font-bold hover:bg-red-700 flex items-center gap-2 justify-center"><i class="fa fa-sign-out-alt"></i> Logout</button>
+        </form>
+    </aside>
     <!-- Main Content -->
-    <main class="flex-1 p-8">
+    <main class="flex-1 p-2 sm:p-4 md:p-8 mt-20 lg:mt-0 lg:ml-64 transition-all duration-300">
         <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
         <div class="max-w-6xl mx-auto">
-            <div class="mb-8 flex items-center justify-between">
-                <h1 class="text-3xl font-extrabold text-green-900 tracking-tight">Admin Dashboard</h1>
+            <div class="mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                <h1 class="text-2xl md:text-3xl font-extrabold text-green-900 tracking-tight">Admin Dashboard</h1>
                 <span class="text-green-700 font-semibold text-lg">ICT Corps Members Hub</span>
             </div>
-            <div class="glass p-8">
+            <div class="glass p-2 sm:p-4 md:p-8 shadow-xl">
                 <?php
                 // --- USERS TAB ---
                 if ($tab === 'users') {
@@ -197,8 +227,8 @@ $tab = $_GET['tab'] ?? 'users';
                         <h2 class="text-xl font-bold">Manage Users</h2>
                         <button onclick="document.getElementById('addUserModal').classList.remove('hidden')" class="bg-green-700 text-white px-4 py-2 rounded">Add User</button>
                     </div>
-                    <div class="overflow-x-auto">
-                    <table class="min-w-full border rounded">
+                    <div class="overflow-x-auto w-full">
+                    <table class="min-w-full whitespace-nowrap border rounded text-sm md:text-base">
                         <thead class="bg-green-100">
                             <tr>
                                 <th class="px-4 py-2">Name</th>
@@ -213,12 +243,12 @@ $tab = $_GET['tab'] ?? 'users';
                         <tbody>
                             <?php foreach ($users as $user): ?>
                             <tr class="border-b">
-                                <td class="px-4 py-2"> <?= htmlspecialchars($user['name']) ?> </td>
-                                <td class="px-4 py-2"> <?= htmlspecialchars($user['email']) ?> </td>
-                                <td class="px-4 py-2"> <?= htmlspecialchars($user['occupation']) ?> </td>
-                                <td class="px-4 py-2"> <?= htmlspecialchars($user['state_code']) ?> </td>
-                                <td class="px-4 py-2"> <?= htmlspecialchars($user['phone']) ?> </td>
-                                <td class="px-4 py-2">
+                                <td class="px-4 py-2 whitespace-nowrap"> <?= htmlspecialchars($user['name']) ?> </td>
+                                <td class="px-4 py-2 whitespace-nowrap"> <?= htmlspecialchars($user['email']) ?> </td>
+                                <td class="px-4 py-2 whitespace-nowrap"> <?= htmlspecialchars($user['occupation']) ?> </td>
+                                <td class="px-4 py-2 whitespace-nowrap"> <?= htmlspecialchars($user['state_code']) ?> </td>
+                                <td class="px-4 py-2 whitespace-nowrap"> <?= htmlspecialchars($user['phone']) ?> </td>
+                                <td class="px-4 py-2 whitespace-nowrap">
                                     <form method="post" style="display:inline-block;">
                                         <input type="hidden" name="update_role_id" value="<?= $user['id'] ?>">
                                         <select name="role_id" class="border rounded px-2 py-1 text-xs">
@@ -229,7 +259,7 @@ $tab = $_GET['tab'] ?? 'users';
                                         <button type="submit" class="ml-1 px-2 py-1 bg-green-600 text-white rounded text-xs">Save</button>
                                     </form>
                                 </td>
-                                <td class="px-4 py-2 flex gap-2">
+                                <td class="px-4 py-2 flex gap-2 whitespace-nowrap">
                                     <form method="post" onsubmit="return confirm('Delete this user?')">
                                         <input type="hidden" name="delete_user_id" value="<?= $user['id'] ?>">
                                         <button class="bg-red-600 text-white px-2 py-1 rounded">Delete</button>
@@ -522,7 +552,23 @@ $tab = $_GET['tab'] ?? 'users';
     });
     </script>
     <?php endif; ?>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Sidebar mobile drawer logic
+        const sidebarMobile = document.getElementById('sidebarMobile');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+        if (sidebarToggle && sidebarMobile) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebarMobile.style.left = '0';
+            });
+        }
+        if (sidebarClose && sidebarMobile) {
+            sidebarClose.addEventListener('click', () => {
+                sidebarMobile.style.left = '-100%';
+            });
+        }
+        // Close modal on background click
         document.addEventListener('click', function(e) {
             if (e.target.id === 'addUserModal') {
                 document.getElementById('addUserModal').classList.add('hidden');
