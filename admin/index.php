@@ -1,3 +1,9 @@
+<?php
+require_once __DIR__ . '/../src/config/database.php';
+require_once __DIR__ . '/../src/models/User.php';
+$userModel = new User($conn);
+$users = $userModel->getAll();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +15,6 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
    
-    //CSS
     <style>
         :root {
             --sidebar-width: 250px;
@@ -180,25 +185,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>John Doe</td>
-                                    <td>john@example.com</td>
-                                    <td>Developer</td>
-                                    <td>LA/21A/1234</td>
-                                    <td>+234 801 234 5678</td>
-                                    <td>Corps Member</td>
-                                    <td>
-                                        <button class="btn btn-success btn-sm action-btn">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-primary btn-sm action-btn">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm action-btn">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                                <!-- Users will be dynamically loaded here -->
                             </tbody>
                         </table>
                     </div>
@@ -219,30 +206,30 @@
                     <form id="addUserForm">
                         <div class="mb-3">
                             <label class="form-label">Name</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" class="form-control" name="name" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control" required>
+                            <input type="email" class="form-control" name="email" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Occupation</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" class="form-control" name="occupation" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">State Code</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" class="form-control" name="state_code" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Phone</label>
-                            <input type="tel" class="form-control" required>
+                            <input type="tel" class="form-control" name="phone" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Role</label>
-                            <select class="form-select">
-                                <option>Corps Member</option>
-                                <option>Admin</option>
-                                <option>Supervisor</option>
+                            <select class="form-select" name="role">
+                                <option value="Corps Member">Corps Member</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Supervisor">Supervisor</option>
                             </select>
                         </div>
                     </form>
@@ -250,6 +237,59 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" form="addUserForm" class="btn btn-primary">Add User</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        <input type="hidden" name="id" id="editUserId">
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" name="name" id="editUserName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" id="editUserEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Occupation</label>
+                            <input type="text" class="form-control" name="occupation" id="editUserOccupation" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">State Code</label>
+                            <input type="text" class="form-control" name="state_code" id="editUserStateCode" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" name="phone" id="editUserPhone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <select class="form-select" name="role_id" id="editUserRole">
+                                <option value="1">Corps Member</option>
+                                <option value="2">Admin</option>
+                                <option value="3">Supervisor</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password (leave blank to keep unchanged)</label>
+                            <input type="password" class="form-control" name="password" id="editUserPassword">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="editUserForm" class="btn btn-primary">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -266,15 +306,125 @@
             document.getElementById('main-content').classList.toggle('sidebar-active');
         });
 
-        // Form Submission Handler
-        document.getElementById('addUserForm').addEventListener('submit', function(e) {
+        // Helper: Fetch and render users
+        function loadUsers() {
+            fetch('user_actions.php?action=list')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.querySelector('.user-table tbody');
+                    tbody.innerHTML = '';
+                    data.users.forEach(user => {
+                        tbody.innerHTML += `
+                        <tr>
+                            <td>${user.name}</td>
+                            <td>${user.email}</td>
+                            <td>${user.occupation}</td>
+                            <td>${user.state_code}</td>
+                            <td>${user.phone}</td>
+                            <td>${user.role_name || 'Member'}</td>
+                            <td>
+                                <button class="btn btn-success btn-sm action-btn view-btn" data-id="${user.id}"><i class="fas fa-eye"></i></button>
+                                <button class="btn btn-primary btn-sm action-btn edit-btn" data-id="${user.id}"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-danger btn-sm action-btn delete-btn" data-id="${user.id}"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+                    });
+                });
+        }
+
+        // Add User
+        const addUserForm = document.getElementById('addUserForm');
+        addUserForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            // Add your form submission logic here
-            
-            // Close modal after submission
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
-            modal.hide();
+            const formData = new FormData(addUserForm);
+            formData.append('action', 'add');
+            fetch('user_actions.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    loadUsers();
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+                    modal.hide();
+                    addUserForm.reset();
+                } else {
+                    alert('Failed to add user');
+                }
+            });
         });
+
+        // Delete User
+        // Delegate event
+        document.querySelector('.user-table tbody').addEventListener('click', function(e) {
+            if (e.target.closest('.delete-btn')) {
+                const id = e.target.closest('.delete-btn').getAttribute('data-id');
+                if (confirm('Are you sure you want to delete this user?')) {
+                    const formData = new FormData();
+                    formData.append('action', 'delete');
+                    formData.append('id', id);
+                    fetch('user_actions.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) loadUsers();
+                        else alert('Failed to delete user');
+                    });
+                }
+            }
+        });
+
+        // Edit User: open modal and populate fields
+        document.querySelector('.user-table tbody').addEventListener('click', function(e) {
+            if (e.target.closest('.edit-btn')) {
+                const id = e.target.closest('.edit-btn').getAttribute('data-id');
+                fetch('user_actions.php?action=list')
+                    .then(res => res.json())
+                    .then(data => {
+                        const user = data.users.find(u => u.id == id);
+                        if (user) {
+                            document.getElementById('editUserId').value = user.id;
+                            document.getElementById('editUserName').value = user.name;
+                            document.getElementById('editUserEmail').value = user.email;
+                            document.getElementById('editUserOccupation').value = user.occupation;
+                            document.getElementById('editUserStateCode').value = user.state_code;
+                            document.getElementById('editUserPhone').value = user.phone;
+                            document.getElementById('editUserRole').value = user.role_id;
+                            document.getElementById('editUserPassword').value = '';
+                            const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+                            modal.show();
+                        }
+                    });
+            }
+        });
+
+        // Handle Edit User form submit
+        const editUserForm = document.getElementById('editUserForm');
+        editUserForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(editUserForm);
+            formData.append('action', 'edit');
+            fetch('user_actions.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    loadUsers();
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+                    modal.hide();
+                } else {
+                    alert('Failed to update user');
+                }
+            });
+        });
+
+        // Initial load
+        loadUsers();
 
         // Responsive Sidebar
         function handleResize() {
