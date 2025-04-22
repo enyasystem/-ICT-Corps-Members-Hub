@@ -1,4 +1,5 @@
 <?php
+
 // Load site settings for logo and colors
 $siteSettings = [];
 $settingsPath = __DIR__ . '/../../public/uploads/site_settings.json';
