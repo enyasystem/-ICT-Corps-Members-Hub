@@ -61,15 +61,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // If no errors, insert user
         if (empty($errors)) {
             $hashed = password_hash($password, PASSWORD_DEFAULT);
-            // Insert user with all fields
-            $stmt = $conn->prepare("INSERT INTO users (name, email, state_code, occupation, phone, socials, portfolio, contact_private, password, profile_picture) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            // Get the role_id for 'member'
+            $role_stmt = $conn->prepare("SELECT id FROM roles WHERE name = 'member' LIMIT 1");
+            $role_stmt->execute();
+            $role_res = $role_stmt->get_result();
+            $role_id = null;
+            if ($row = $role_res->fetch_assoc()) {
+                $role_id = $row['id'];
+            }
+            // Insert user with all fields and default role_id as 'member'
+            $stmt = $conn->prepare("INSERT INTO users (name, email, state_code, occupation, phone, socials, portfolio, contact_private, password, profile_picture, role_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $occupation = $_POST['occupation'] ?? null;
             $phone = $_POST['phone'] ?? null;
             $socials = $_POST['socials'] ?? null;
             $portfolio = $_POST['portfolio'] ?? null;
             $contact_private = !empty($_POST['contact_private']) ? 1 : 0;
             $profile_picture_param = $profile_picture;
-            $stmt->bind_param('ssssssssss', $name, $email, $state_code, $occupation, $phone, $socials, $portfolio, $contact_private, $hashed, $profile_picture_param);
+            $stmt->bind_param('ssssssssssi', $name, $email, $state_code, $occupation, $phone, $socials, $portfolio, $contact_private, $hashed, $profile_picture_param, $role_id);
             $ok = $stmt->execute();
             $user_id = $conn->insert_id;
             // Save skills (if any)
