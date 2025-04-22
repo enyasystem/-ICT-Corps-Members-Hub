@@ -18,10 +18,7 @@ function getBusiness($conn, $business_id) {
 <!-- HERO SECTION WITH CAROUSEL -->
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 <style>
-    body {
-        margin: 0 !important;
-        padding: 0 !important;
-    }
+    html, body { margin: 0 !important; padding: 0 !important; }
     .hero-carousel {
         position: relative;
         height: 100vh;
@@ -44,12 +41,13 @@ function getBusiness($conn, $business_id) {
         visibility: visible;
     }
     .overlay {
+        /* Fully transparent, no background */
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(49, 93, 65, 0.75);
+        background: transparent !important;
     }
     .carousel-dots {
         position: absolute;
@@ -82,7 +80,7 @@ function getBusiness($conn, $business_id) {
 </style>
 <!-- If your nav bar is in layout.php, ensure it does NOT have margin-bottom or padding-bottom -->
 <!-- HERO SECTION STARTS IMMEDIATELY AFTER NAV -->
-<section class="hero-carousel relative" style="margin-top:0;padding-top:0;">
+<section class="hero-carousel relative" style="margin-top:0 !important; padding-top:0 !important;">
     <!-- Carousel Items -->
     <div class="carousel-item active" style="background: url('https://images.unsplash.com/photo-1504384764586-bb4cdc1707b0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover;">
         <div class="overlay"></div>
