@@ -7,7 +7,7 @@ $excos_result = $conn->query($excos_sql);
 $excos = $excos_result ? $excos_result->fetch_all(MYSQLI_ASSOC) : [];
 
 // Define the order for key roles
-$priority_roles = ['president', 'vice-president', 'pro', 'treasurer'];
+$priority_roles = ['supervisor', 'president', 'vice-president', 'pro', 'treasurer'];
 $priority_members = [];
 $other_members = [];
 foreach ($priority_roles as $role) {
@@ -21,6 +21,8 @@ foreach ($priority_roles as $role) {
 // Remaining members
 $other_members = array_values($excos);
 $ordered_members = array_merge($priority_members, $other_members);
+$ordered_members = array_slice($ordered_members, 0, 9); // Limit to 9 featured members
+
 function getBusiness($conn, $business_id) {
     if (!$business_id) return null;
     $stmt = $conn->prepare("SELECT name FROM businesses WHERE id = ?");
