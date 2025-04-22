@@ -1,0 +1,18 @@
+[22-Apr-2025 17:48:53 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'date' in 'field list' in C:\xampp\htdocs\ICT-Corps-Members-Hub\src\models\Event.php:26
+Stack trace:
+#0 C:\xampp\htdocs\ICT-Corps-Members-Hub\src\models\Event.php(26): mysqli->prepare('INSERT INTO eve...')
+#1 C:\xampp\htdocs\ICT-Corps-Members-Hub\admin\event_actions.php(46): Event->create(Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\ICT-Corps-Members-Hub\src\models\Event.php on line 26
+[22-Apr-2025 17:48:54 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'date' in 'field list' in C:\xampp\htdocs\ICT-Corps-Members-Hub\src\models\Event.php:26
+Stack trace:
+#0 C:\xampp\htdocs\ICT-Corps-Members-Hub\src\models\Event.php(26): mysqli->prepare('INSERT INTO eve...')
+#1 C:\xampp\htdocs\ICT-Corps-Members-Hub\admin\event_actions.php(46): Event->create(Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\ICT-Corps-Members-Hub\src\models\Event.php on line 26
+[22-Apr-2025 17:48:58 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'date' in 'field list' in C:\xampp\htdocs\ICT-Corps-Members-Hub\src\models\Event.php:26
+Stack trace:
+#0 C:\xampp\htdocs\ICT-Corps-Members-Hub\src\models\Event.php(26): mysqli->prepare('INSERT INTO eve...')
+#1 C:\xampp\htdocs\ICT-Corps-Members-Hub\admin\event_actions.php(46): Event->create(Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\ICT-Corps-Members-Hub\src\models\Event.php on line 26
