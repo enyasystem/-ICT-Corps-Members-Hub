@@ -14,7 +14,7 @@ if (file_exists($settingsPath)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ICT Corps Members Hub</title>
     <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
     <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -65,7 +65,7 @@ if (file_exists($settingsPath)) {
             <div class="small mt-2 mt-md-0">&copy; <?php echo date("Y"); ?> ICT Corps Members Hub. All rights reserved.</div>
         </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> -->
     <script src="/js/main.js"></script>
 </body>
 </html>

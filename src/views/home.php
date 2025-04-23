@@ -128,11 +128,12 @@ include __DIR__ . '/navbar.php';
     }
     /* Navbar background transition on scroll */
     .navbar {
-      background: transparent;
-      transition: background 0.3s;
+      background: transparent !important;
+      box-shadow: none;
+      transition: background 0.3s, box-shadow 0.3s;
     }
     .navbar.navbar-scrolled {
-      background: rgba(20, 83, 45, 0.97); /* Deep green, almost opaque */
+      background: rgba(20, 83, 45, 0.97) !important; /* Deep green, almost opaque */
       box-shadow: 0 2px 16px 0 rgba(20, 83, 45, 0.10);
     }
     .member-card {
@@ -269,7 +270,7 @@ include __DIR__ . '/navbar.php';
 <!-- Navbar -->
 <nav class="navbar navbar-expand-md navbar-dark fixed-top">
   <div class="container">
-    <a class="navbar-brand fw-bold text-white" href="#">CorperConnect</a>
+    <a class="navbar-brand fw-bold text-white" href="#">ICT Corps Members Hub</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
