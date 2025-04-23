@@ -139,6 +139,9 @@ ob_start();
     <span>Failed to update profile.</span>
   </div>
 <?php endif; ?>
+
+<?php include __DIR__ . '/navbar.php'; ?>
+
 <div class="max-w-3xl mx-auto mt-12 mb-12 bg-white/80 glassmorphism p-10 rounded-3xl shadow-2xl animate-fade-in">
     <h1 class="text-3xl md:text-4xl font-extrabold text-green-800 mb-4 flex items-center gap-2">
         <i class="fa-solid fa-user-circle text-green-700"></i> Welcome, <?= htmlspecialchars($_SESSION['user_name']) ?>!

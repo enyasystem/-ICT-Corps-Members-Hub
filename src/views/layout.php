@@ -25,7 +25,7 @@ if (file_exists($settingsPath)) {
         font-size: 2.5rem;
         font-weight: 800;
         color: <?= isset($siteSettings['primary_color']) ? htmlspecialchars($siteSettings['primary_color']) : '#008751' ?>;
-        margin-bottom: 2rem;
+        /* margin-bottom: 2rem; */
       }
       .member-card {
         transition: transform 0.2s, box-shadow 0.2s;
@@ -51,7 +51,7 @@ if (file_exists($settingsPath)) {
         <?php echo $content; ?>
     </main>
     <!-- Footer -->
-    <footer class="nysc-gradient text-white py-4 mt-5 shadow-inner">
+    <footer class="nysc-gradient text-white py-4 mt-5 shadow-inner" style="background: #14532d;">
         <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
             <div class="d-flex align-items-center gap-2">
                 <img src="/assets/nysc-logo.png" alt="NYSC Logo" class="rounded-circle bg-white p-1" style="height:32px;width:32px;"/>

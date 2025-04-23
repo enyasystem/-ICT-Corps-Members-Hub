@@ -9,6 +9,8 @@ while ($row = $result->fetch_assoc()) {
     $resources[] = $row;
 }
 ?>
+<?php include __DIR__ . '/navbar.php'; ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

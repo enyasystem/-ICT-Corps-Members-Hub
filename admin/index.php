@@ -161,7 +161,7 @@ $tab = $_GET['tab'] ?? 'users';
                 $roles_result = $conn->query("SELECT id, display_name FROM roles ORDER BY id");
                 while ($row = $roles_result->fetch_assoc()) $roles[] = $row;
                 // Define unique roles
-                $unique_roles = ['president', 'vice-president', 'treasurer'];
+                $unique_roles = ['president', 'vice-president', 'treasurer', 'pro'];
                 // Handle CRUD actions
                 if (isset($_POST['delete_user_id'])) {
                     $stmt = $conn->prepare("DELETE FROM users WHERE id=?");
@@ -221,6 +221,7 @@ $tab = $_GET['tab'] ?? 'users';
                             echo '<div class="alert alert-success mb-3">User role updated.</div>';
                         }
                     } else {
+                        // Allow 'exco' and other non-unique roles to be assigned to multiple users
                         $stmt = $conn->prepare("UPDATE users SET role_id=? WHERE id=?");
                         $stmt->bind_param('ii', $role_id, $_POST['update_role_id']);
                         $stmt->execute();
